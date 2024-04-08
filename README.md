@@ -1,6 +1,6 @@
 # 🔗 makesite
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/YOUR_USERNAME/YOUR_REPONAME)](https://goreportcard.com/report/github.com/YOUR_USERNAME/YOUR_REPONAME)
+[![Go Report Card](https://goreportcard.com/badge/github.com/EpiXCoder/makesite)](https://goreportcard.com/report/github.com/EpiXCoder/makesite)
 
 _Create your own custom Static Site Generator (like [Jekyll](https://jekyllrb.com/) or [Hugo](https://gohugo.io/)) by cloning and fulfilling the requirements in this repo!_
 
