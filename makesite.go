@@ -4,31 +4,30 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	// "io/fs"
-	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 	"time"
 )
 
-func findTxtFiles(dirPath string) []string {
+// findTxtFiles uses filepath.Walk to recursively find all .txt files in dirPath and its subdirectories.
+func findTxtFiles(dirPath string) ([]string, error) {
 	var files []string
-	entries, err := ioutil.ReadDir(dirPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, entry := range entries {
-		if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".txt") {
-			files = append(files, entry.Name())
+	err := filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
 		}
-	}
-
-	return files
+		if !info.IsDir() && strings.HasSuffix(info.Name(), ".txt") {
+			files = append(files, path)
+		}
+		return nil
+	})
+	return files, err
 }
 
+// generateHTML reads a .txt file, extracts the title and content, and uses a template to generate an HTML file.
 func generateHTML(fileName string, tmpl *template.Template) {
 	file, err := os.Open(fileName)
 	if err != nil {
@@ -37,7 +36,7 @@ func generateHTML(fileName string, tmpl *template.Template) {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	scanner.Scan() // This reads the first line, which is the title
+	scanner.Scan() // Reads the first line, which is the title
 	title := scanner.Text()
 
 	content := ""
@@ -80,7 +79,11 @@ func main() {
 	}
 
 	start := time.Now()
-	files := findTxtFiles(*dirPtr)
+	files, err := findTxtFiles(*dirPtr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	totalBytes := int64(0)
 
 	for _, fileName := range files {
@@ -96,4 +99,3 @@ func main() {
 	duration := time.Since(start)
 	fmt.Printf("\033[1;32mSuccess!\033[0m Generated \033[1m%d\033[0m pages (%.1fkB total) in %.2f seconds.\n", len(files), float64(totalBytes)/1024, duration.Seconds())
 }
-
